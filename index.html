@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Promise in JS</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+          <textarea data-template>
+            # Promise in JS
+          </textarea>
+        </section>
+				<section data-markdown>
+          <textarea data-template>
+            # Contents
+            
+            - WHAT IS PROMISE?
+
+            - SYNC AND ASYNC CODE
+
+            - PROMISE STRUCTURE
+
+            - THEN, CATCH, FINALLY
+
+            - PROMISE API
+
+            - ASYNC/AWAIT
+          </textarea>
+        </section>
+				<section>
+          <h1>What is Promise?</h1>
+          <p class="fragment">A promise is a special JavaScript object that holds the future value of an async operation.</p>
+        </section>
+				<section>
+          <section>
+            <h1>Sync and async code</h1>
+          </section>
+          <section>
+            <h2>Sync code</h2>
+            <pre><code>
+getData(function(x){
+  console.log(x);
+  getMoreData(x, function(y){
+    console.log(y); 
+    getSomeMoreData(y, function(z){ 
+      console.log(z);
+    });
+  });
+});
+            </code></pre>
+          </section>
+          <section>
+            <h2>Async code</h2>
+            <pre><code>
+getData()
+  .then((x) => {
+    console.log(x);
+    return getMoreData(x);
+  })
+  .then((y) => {
+    console.log(y);
+    return getSomeMoreData(y);
+  })
+  .then((z) => {
+    console.log(z);
+  });
+            </code></pre>
+          </section>
+        </section>
+				<section>
+          <section>
+            <h1>Promise structure</h1>
+            <p>The constructor syntax for a promise object is:</p>
+            <pre><code>
+let promise = new Promise((resolve, reject) => {
+  // executor
+});
+            </code></pre>
+          </section>
+          <section>
+            <h2>Created Promise</h2>
+            <pre><code>
+{
+  state: "pending",
+  result: undefined
+}
+            </code></pre>
+          </section>
+          <section>
+            <h2>Resolved Promise</h2>
+            <pre><code>
+{
+  state: "fulfilled",
+  result: value
+}
+            </code></pre>
+          </section>
+          <section>
+            <h2>Rejected Promise</h2>
+            <pre><code>
+{
+  state: "rejected",
+  result: error
+}
+            </code></pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h1>then, catch, finally</h1>
+          </section>
+          <section>
+            <h1>.then</h1>
+            <pre><code>
+promise.then(
+  function(result) { /* handle a result */ },
+  function(error) { /* handle an error */ }
+);
+            </code></pre>
+          </section>
+          <section>
+            <h1>Promises chaining</h1>
+            <pre><code>
+new Promise(function(resolve, reject) {
+  setTimeout(() => resolve(1), 1000);            
+}).then(function(result) {              
+  alert(result); // 1
+  return result * 2;              
+}).then(function(result) {              
+  alert(result); // 2
+  return result * 2;              
+}).then(function(result) {              
+  alert(result); // 4
+  return result * 2;              
+});
+            </code></pre>
+          </section>
+          <section>
+            <h1>fetch</h1>
+            <pre class="fragment"><code>
+let promise = fetch(url);
+            </code></pre>
+            <pre class="fragment"><code>
+fetch('/article/promise-chaining/user.json')
+  .then(response => response.json())
+  .then(user => alert(user.name));
+            </code></pre>
+          </section>
+          <section>
+            <h1>.catch</h1>
+            <pre><code>
+const promise1 = new Promise((resolve, reject) => {
+  resolve('Promise1 resolved');
+});
+const promise2 = new Promise((resolve, reject) => {
+  resolve('Promise2 resolved');
+});
+const promise3 = new Promise((resolve, reject) => {
+  reject('Promise3 rejected');
+});
+
+promise1
+  .then((data) => {
+    console.log(data);  // Promise1 resolved
+    return promise2;
+  })
+  .then((data) => {
+    console.log(data);  // Promise2 resolved
+    return promise3;
+  })
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((error) => {
+    console.log(error);  // Promise3 rejected
+  });
+            </code></pre>
+          </section>
+          <section>
+            <h1>finally</h1>
+            <pre><code>
+new Promise((resolve, reject) => {
+  /* do something that takes time,
+  and then call resolve or maybe reject */
+})
+  /* runs when the promise is settled,
+  doesn't matter successfully or not */
+  .finally(() => stop loading indicator)
+  /* so the loading indicator is always
+  stopped before we go on */
+  .then(result => show result, err => show error)
+            </code></pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h1>Promise API</h1>
+          </section>
+          <section>
+            <h1>Promise.all</h1>
+            <pre><code>
+let promise = Promise.all(iterable);
+            </code></pre>
+            <p>If any of the promises is rejected, the promise returned by Promise.all immediately rejects with that error.</p>
+          </section>
+          <section>
+            <h1>Promise.allSettled</h1>
+            <p>Result array:</p>
+            <p>for successful responses:</p>
+            <pre><code>
+{status:"fulfilled", value:result}
+            </code></pre>
+            <p>for errors:</p>
+            <pre><code>
+{status:"rejected", reason:error}
+            </code></pre>
+          </section>
+          <section>
+            <h1>Promise.race</h1>
+            <p>Similar to Promise.all, but waits only for the first settled promise and gets its result (or error).</p>
+          </section>
+          <section>
+            <h1>Promise.any</h1>
+            <p>Similar to Promise.race, but waits only for the first fulfilled promise and gets its result.</p>
+          </section>
+          <section>
+            <h1>Promise.resolve</h1>
+            <pre><code>
+Promise.resolve(value) 
+            </code></pre>
+            <p>Creates a resolved promise with the result value.</p>
+          </section>
+          <section>
+            <h1>Promise.reject(error)</h1>
+            <pre><code>
+Promise.reject(error) 
+            </code></pre>
+            <p>Creates a rejected promise with error.</p>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h1>Async/await</h1>
+          </section>
+          <section>
+            <h1>Async</h1>
+            <pre><code>
+async function f() {
+  return 1;
+}
+
+f().then(alert); // 1
+            </code></pre>
+          </section>
+          <section>
+            <h1>Await</h1>
+            <pre><code>
+// works only inside async functions
+let value = await promise;
+            </code></pre>
+          </section>
+          <section>
+            <h1>Error handling</h1>
+            <pre><code>
+async function f() {
+
+  try {
+    let response = await fetch('http://no-such-url');
+  } catch(err) {
+    alert(err); // TypeError: failed to fetch
+  }
+}
+
+f();
+            </code></pre>
+          </section>
+          <section>
+            <h1>Error handling</h1>
+            <pre><code>
+async function f() {
+  let response = await fetch('http://no-such-url');
+}
+
+// f() becomes a rejected promise
+f().catch(alert); // TypeError: failed to fetch // (*)
+            </code></pre>
+          </section>
+          
+        </section>
+        <section>
+          <h1>The End</h1>
+          <p>Thank You for Your attention.</p>
+        </section>
+			</div>
+		</div>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
